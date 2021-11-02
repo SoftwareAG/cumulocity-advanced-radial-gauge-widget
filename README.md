@@ -2,7 +2,7 @@
 
 This widget shows the latest realtime measurement on a radial gauge.
 
-<img src="/assets/img-preview.png" />
+![Preview](src/advanced-radial-gauge/assets/img-preview.png)
 
 ### Installation - for the dashboards using Runtime Widget Loader
 1. Download the latest `advanced-radial-gauge-{version}.zip` file from the Releases section.
