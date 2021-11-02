@@ -1,0 +1,13 @@
+{
+    "name": "Advanced Radial Gauge",
+    "contextPath": "advanced-radial-gauge",
+    "key": "advanced-radial-gauge-application-key",
+    "contentSecurityPolicy": "default-src 'self'",
+    "description": "Cumulocity IoT Advanced Radial Gauge runtime widget",
+    "icon": {
+        "class": "fa fw fa-database"
+    },
+    "manifest": {
+        "noAppSwitcher": true
+    }
+}
