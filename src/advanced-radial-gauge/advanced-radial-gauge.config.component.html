@@ -12,13 +12,13 @@
             <div class="col-lg-4">
                 <div class="form-group">
                     <label>Measurement font size</label>
-                    <input type="number" class="form-control" [(ngModel)]="widgetInfo.measurement.fontSize" (change)="updateConfig()" />
+                    <input type="number" class="form-control" [(ngModel)]="widgetInfo.measurement.fontSize" min="1" (change)="updateConfig()" />
                 </div>
             </div>
             <div class="col-lg-4">
                 <div class="form-group">
                     <label>No. of digits after decimal</label>
-                    <input type="number" class="form-control" [(ngModel)]="widgetInfo.measurement.decimalDigits" (change)="updateConfig()" />
+                    <input type="number" class="form-control" [(ngModel)]="widgetInfo.measurement.decimalDigits" min="0" (change)="updateConfig()" />
                 </div>
             </div>
         </div>
@@ -43,7 +43,7 @@
                 <div class="col-lg-3">
                     <div class="form-group">
                         <label>Axis width</label>
-                        <input type="number" class="form-control" [(ngModel)]="widgetInfo.gauge.axisWidth" />
+                        <input type="number" class="form-control" min="1" [(ngModel)]="widgetInfo.gauge.axisWidth" />
                     </div>
                 </div>
                 <div class="col-lg-3">
@@ -88,12 +88,12 @@
                 <div class="col-lg-4">
                     <div class="form-group">
                         <label>Font size</label>
-                        <input type="number" class="form-control" [(ngModel)]="widgetInfo.label.fontSize" (change)="updateConfig()" />
+                        <input type="number" class="form-control" [(ngModel)]="widgetInfo.label.fontSize" min="1" (change)="updateConfig()" />
                     </div>
                 </div>
                 <div class="col-lg-4">
                     <div class="form-group">
-                        <label>Hyperlink</label>
+                        <label>Hyperlink (optional)</label>
                         <input type="text" class="form-control" [(ngModel)]="widgetInfo.label.hyperlink" (change)="updateConfig()" />
                     </div>
                 </div>

@@ -19,12 +19,11 @@
  * @format
  */
 
-import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { MeasurementService, Realtime } from "@c8y/client";
 import * as _ from 'lodash';
 import * as echarts from "echarts";
 import { formatDate } from '@angular/common';
-import { TOUCH_BUFFER_MS } from '@angular/cdk/a11y';
 
 @Component({
     selector: "lib-advanced-radial-gauge",
@@ -68,6 +67,7 @@ export class AdvancedRadialGauge implements OnDestroy, OnInit, AfterViewInit {
     private axisLineColors = [];
     private maxValue = 0;
     private subscription;
+    private title = "";
     private lastMeasurement = {
         value: 0,
         unit: ''
@@ -164,6 +164,15 @@ export class AdvancedRadialGauge implements OnDestroy, OnInit, AfterViewInit {
                     );
                 });
             }
+
+            // Set Title
+            if(this.label.text !== "") {
+                if(this.label.hyperlink === "") {
+                    this.title = this.label.text;
+                } else {
+                    this.title = this.label.text + " \u{1F855}";
+                }
+            }
         } catch(e) {
             console.log("Advanced Radial Guage Widget - "+e);
         }
@@ -191,7 +200,7 @@ export class AdvancedRadialGauge implements OnDestroy, OnInit, AfterViewInit {
 
         option = {
             title: {
-                text: this.label.text,
+                text: this.title,
                 left: 'center',
                 bottom: '0%',
                 textStyle: {
@@ -274,29 +283,35 @@ export class AdvancedRadialGauge implements OnDestroy, OnInit, AfterViewInit {
             }]
         };
 
-        
-
-        /*this.subscription = this.realtime.subscribe('/measurements/'+this.deviceId, (data) => {
-            if(_.has(data.data.data[this.measurement.fragment], [this.measurement.series])) {
-                myChart.setOption<echarts.EChartsOption>({
-                    series: [
-                        {
-                            detail : {
-                                formatter: '{value} '+data.data.data[this.measurement.fragment][this.measurement.series].unit
-                            },
-                            data: [
-                                {
-                                    name: this.data.label,
-                                    value: data.data.data[this.measurement.fragment][this.measurement.series].value
-                                }
-                            ]
-                        }
-                    ]
-                });
+        // Subscribe realtime to measurement
+        this.subscription = this.realtime.subscribe('/measurements/'+this.deviceId, (data) => {
+            try {
+                if(data.data.data[this.measurement.fragment] !== undefined && data.data.data[this.measurement.fragment][this.measurement.series] !== undefined) {
+                    let me = this;
+                    this.radialGauge.setOption<echarts.EChartsOption>({
+                        series: [
+                            {
+                                detail : {
+                                    formatter: function(value) {
+                                        return value.toFixed(me.measurement.decimalDigits) + ' ' + data.data.data[me.measurement.fragment][me.measurement.series].unit
+                                    }
+                                },
+                                data: [
+                                    {
+                                        value: data.data.data[me.measurement.fragment][me.measurement.series].value
+                                    }
+                                ]
+                            }
+                        ]
+                    });
+                }
+            } catch(e) {
+                console.log("Advanced Radial Gauge Widget - "+e);
             }
-        });*/
+        });
 
-        let me = this;
+        // Uncomment this code to test locally. Comment the above realtime subscription.
+        /*let me = this;
         setInterval(function () {
             const random = +(Math.random() * 60).toFixed(2);
             me.radialGauge.setOption<echarts.EChartsOption>({
@@ -315,7 +330,7 @@ export class AdvancedRadialGauge implements OnDestroy, OnInit, AfterViewInit {
                     }
                 ]
             });
-        }, 2000);
+        }, 2000);*/
 
         option && this.radialGauge.setOption(option);
     }

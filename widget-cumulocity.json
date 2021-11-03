@@ -1,5 +1,5 @@
 {
-    "name": "Advanced Radial Gauge",
+    "name": "Advanced Radial Gauge Widget",
     "contextPath": "advanced-radial-gauge",
     "key": "advanced-radial-gauge-application-key",
     "contentSecurityPolicy": "default-src 'self'",
