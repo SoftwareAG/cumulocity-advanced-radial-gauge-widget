@@ -34,7 +34,9 @@ export class AdvancedRadialGauge implements OnDestroy, OnInit, AfterViewInit {
 
     @Input() config;
 
-    public uniqueId = 'id-'+Date.now();
+    public uniqueId = "";
+
+    public topMargin = "";
 
     private radialGauge: echarts.ECharts;
 
@@ -77,6 +79,15 @@ export class AdvancedRadialGauge implements OnDestroy, OnInit, AfterViewInit {
 
     async ngOnInit(): Promise<void> {
         try {
+
+            // Create Timestamp
+            let creationTimeStamp = _.get(this.config, 'customwidgetdata.creationTimestamp');
+            if(creationTimeStamp === undefined || creationTimeStamp === null) {
+                throw new Error("Creation timestamp is blank.");
+            } else {
+                this.uniqueId = "id-" + creationTimeStamp;
+            }
+
             // Device ID
             this.deviceId = _.get(this.config, 'device.id');
             if(this.deviceId === undefined || this.deviceId === null || this.deviceId === "") {
@@ -186,6 +197,7 @@ export class AdvancedRadialGauge implements OnDestroy, OnInit, AfterViewInit {
                 this.lastMeasurement.value = resp.data[0][this.measurement.fragment][this.measurement.series].value;
                 this.lastMeasurement.unit = resp.data[0][this.measurement.fragment][this.measurement.series].unit;
             }
+            this.configureTopMarginRequired();
             // Show Chart
             this.showChart();
         } catch(e) {
@@ -198,6 +210,7 @@ export class AdvancedRadialGauge implements OnDestroy, OnInit, AfterViewInit {
         this.radialGauge = echarts.init(chartDom);
         let option: echarts.EChartsOption;
 
+        let me = this;
         option = {
             title: {
                 text: this.title,
@@ -275,7 +288,9 @@ export class AdvancedRadialGauge implements OnDestroy, OnInit, AfterViewInit {
                     color: this.gauge.indicatorType === 'progressbar' ? this.gauge.progressBar.color : 'inherit',
                     offsetCenter: [0, '0%'],
                     width: '30%',
-                    formatter: '{value} '+this.lastMeasurement.unit
+                    formatter: function(value) {
+                        return value.toFixed(me.measurement.decimalDigits) + ' ' + me.lastMeasurement.unit
+                    }
                 },
                 data: [{
                     value: this.lastMeasurement.value,
@@ -287,7 +302,6 @@ export class AdvancedRadialGauge implements OnDestroy, OnInit, AfterViewInit {
         this.subscription = this.realtime.subscribe('/measurements/'+this.deviceId, (data) => {
             try {
                 if(data.data.data[this.measurement.fragment] !== undefined && data.data.data[this.measurement.fragment][this.measurement.series] !== undefined) {
-                    let me = this;
                     this.radialGauge.setOption<echarts.EChartsOption>({
                         series: [
                             {
@@ -350,6 +364,25 @@ export class AdvancedRadialGauge implements OnDestroy, OnInit, AfterViewInit {
           }
           const resp = await this.measurementService.list(filter);
           return resp;
+    }
+
+    // Configure top margin within the widget. This is on the basis if the Widget title is set to hidden or not.
+    private configureTopMarginRequired(): void {
+    let allWidgets: NodeListOf<Element> = document.querySelectorAll('.dashboard-grid-child');
+        allWidgets.forEach((w:Element) => {
+            let widgetElement: Element = w.querySelector('div > div > div > c8y-dynamic-component > lib-advanced-radial-gauge');
+            if(widgetElement !== undefined && widgetElement !== null) {
+                let widgetTitleElement: Element = w.querySelector('div > div > div > c8y-dashboard-child-title');
+                const widgetTitleDisplayValue: string = window.getComputedStyle(widgetTitleElement).getPropertyValue('display');
+                if(widgetTitleDisplayValue !== undefined && widgetTitleDisplayValue !== null && widgetTitleDisplayValue === 'none') {
+                    console.log("Title hidden");
+                    this.topMargin = '10px';
+                } else {
+                    console.log("Title not hidden");
+                    this.topMargin = '0';
+                }
+            }
+        });
     }
 
     ngOnDestroy(): void {

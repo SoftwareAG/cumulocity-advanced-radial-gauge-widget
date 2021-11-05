@@ -41,6 +41,7 @@ export class AdvancedRadialGaugeConfig implements OnInit, OnDestroy {
         },
         startValue: 0,
         measurement: {
+            supportedSeries: [],
             name: '',
             fontSize: 15,
             decimalDigits: 2
@@ -90,6 +91,7 @@ export class AdvancedRadialGaugeConfig implements OnInit, OnDestroy {
     }
 
     public updateConfig() {
+        console.log(this.widgetInfo);
         _.set(this.config, 'customwidgetdata', this.widgetInfo);
     }
 
@@ -98,12 +100,15 @@ export class AdvancedRadialGaugeConfig implements OnInit, OnDestroy {
             console.log("Advanced Radial Gauge Widget - Cannot get fragment series because device id is blank.");
         } else {
             if(this.oldDeviceId !== this.config.device.id) {
-                this.measurementSeriesDisabled = true;
                 this.fetchClient.fetch('/inventory/managedObjects/'+ this.config.device.id +'/supportedSeries').then((resp: IFetchResponse) => {
                     this.measurementSeriesDisabled = false;
                     if(resp !== undefined) {
                         resp.json().then((jsonResp) => {
-                            this.supportedSeries = jsonResp.c8y_SupportedSeries;
+                            this.widgetInfo.measurement.supportedSeries = jsonResp.c8y_SupportedSeries;
+                            if(!this.widgetInfo.measurement.supportedSeries.includes(this.widgetInfo.measurement.name)) {
+                                this.widgetInfo.measurement.name = "";
+                            }
+                            this.updateConfig();
                         });
                     }
                     this.oldDeviceId = this.config.device.id;

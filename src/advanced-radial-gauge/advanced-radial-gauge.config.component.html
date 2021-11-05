@@ -5,7 +5,7 @@
                 <div class="form-group">
                     <label>Measurement name</label>
                     <select class="form-control" [(ngModel)]="widgetInfo.measurement.name" (focus)="loadFragmentSeries()" (change)="updateConfig()">
-                        <option [ngValue]="seriesValue" *ngFor="let seriesValue of supportedSeries">{{seriesValue}}</option>
+                        <option [ngValue]="seriesValue" *ngFor="let seriesValue of widgetInfo.measurement.supportedSeries">{{seriesValue}}</option>
                     </select>
                 </div>
             </div>
