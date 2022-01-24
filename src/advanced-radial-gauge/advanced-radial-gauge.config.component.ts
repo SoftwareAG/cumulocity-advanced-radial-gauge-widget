@@ -91,7 +91,6 @@ export class AdvancedRadialGaugeConfig implements OnInit, OnDestroy {
     }
 
     public updateConfig() {
-        console.log(this.widgetInfo);
         _.set(this.config, 'customwidgetdata', this.widgetInfo);
     }
 

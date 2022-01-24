@@ -195,7 +195,10 @@ export class AdvancedRadialGauge implements OnDestroy, OnInit, AfterViewInit {
             let resp = await this.getLastMeasurement(this.deviceId, this.measurement.fragment, this.measurement.series);
             if(resp.data.length === 1) {
                 this.lastMeasurement.value = resp.data[0][this.measurement.fragment][this.measurement.series].value;
-                this.lastMeasurement.unit = resp.data[0][this.measurement.fragment][this.measurement.series].unit;
+                if(resp.data[0][this.measurement.fragment][this.measurement.series].unit !== undefined && resp.data[0][this.measurement.fragment][this.measurement.series].unit !== null) {
+                    this.lastMeasurement.unit = resp.data[0][this.measurement.fragment][this.measurement.series].unit;
+                }
+                
             }
             this.configureTopMarginRequired();
             // Show Chart
@@ -302,17 +305,22 @@ export class AdvancedRadialGauge implements OnDestroy, OnInit, AfterViewInit {
         this.subscription = this.realtime.subscribe('/measurements/'+this.deviceId, (data) => {
             try {
                 if(data.data.data[this.measurement.fragment] !== undefined && data.data.data[this.measurement.fragment][this.measurement.series] !== undefined) {
+                    this.lastMeasurement.value = data.data.data[me.measurement.fragment][me.measurement.series].value;
+                    this.lastMeasurement.unit = "";
+                    if(data.data.data[me.measurement.fragment][me.measurement.series].unit !== undefined && data.data.data[me.measurement.fragment][me.measurement.series].unit !== null) {
+                        this.lastMeasurement.unit = data.data.data[me.measurement.fragment][me.measurement.series].unit;
+                    }
                     this.radialGauge.setOption<echarts.EChartsOption>({
                         series: [
                             {
                                 detail : {
                                     formatter: function(value) {
-                                        return value.toFixed(me.measurement.decimalDigits) + ' ' + data.data.data[me.measurement.fragment][me.measurement.series].unit
+                                        return value.toFixed(me.measurement.decimalDigits) + ' ' + me.lastMeasurement.unit;
                                     }
                                 },
                                 data: [
                                     {
-                                        value: data.data.data[me.measurement.fragment][me.measurement.series].value
+                                        value: me.lastMeasurement.value
                                     }
                                 ]
                             }
@@ -375,10 +383,8 @@ export class AdvancedRadialGauge implements OnDestroy, OnInit, AfterViewInit {
                 let widgetTitleElement: Element = w.querySelector('div > div > div > c8y-dashboard-child-title');
                 const widgetTitleDisplayValue: string = window.getComputedStyle(widgetTitleElement).getPropertyValue('display');
                 if(widgetTitleDisplayValue !== undefined && widgetTitleDisplayValue !== null && widgetTitleDisplayValue === 'none') {
-                    console.log("Title hidden");
                     this.topMargin = '10px';
                 } else {
-                    console.log("Title not hidden");
                     this.topMargin = '0';
                 }
             }
