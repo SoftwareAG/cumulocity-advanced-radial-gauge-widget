@@ -24,7 +24,8 @@ import { MeasurementService, Realtime } from "@c8y/client";
 import * as _ from 'lodash';
 import * as echarts from "echarts";
 import { formatDate } from '@angular/common';
-
+import { ResizedEvent } from 'angular-resize-event';
+import { EChartsOption } from 'echarts';
 @Component({
     selector: "lib-advanced-radial-gauge",
     templateUrl: "./advanced-radial-gauge.component.html",
@@ -39,7 +40,10 @@ export class AdvancedRadialGauge implements OnDestroy, OnInit, AfterViewInit {
     public topMargin = "";
 
     private radialGauge: echarts.ECharts;
-
+    radialChartOption: EChartsOption = {};
+     width: number;
+     height: number;
+    
     private deviceId = '';
     private label = {
         text: '',
@@ -75,14 +79,14 @@ export class AdvancedRadialGauge implements OnDestroy, OnInit, AfterViewInit {
         unit: ''
     };
 
-    constructor(private realtime: Realtime, private measurementService: MeasurementService) {}
+    constructor(private realtime: Realtime, private measurementService: MeasurementService) { }
 
     async ngOnInit(): Promise<void> {
         try {
 
             // Create Timestamp
             let creationTimeStamp = _.get(this.config, 'customwidgetdata.creationTimestamp');
-            if(creationTimeStamp === undefined || creationTimeStamp === null) {
+            if (creationTimeStamp === undefined || creationTimeStamp === null) {
                 throw new Error("Creation timestamp is blank.");
             } else {
                 this.uniqueId = "id-" + creationTimeStamp;
@@ -90,13 +94,13 @@ export class AdvancedRadialGauge implements OnDestroy, OnInit, AfterViewInit {
 
             // Device ID
             this.deviceId = _.get(this.config, 'device.id');
-            if(this.deviceId === undefined || this.deviceId === null || this.deviceId === "") {
+            if (this.deviceId === undefined || this.deviceId === null || this.deviceId === "") {
                 throw new Error("Device id is blank.");
             }
 
             // Measurement
             this.measurement.fullname = _.get(this.config, 'customwidgetdata.measurement.name');
-            if(this.measurement.fullname === undefined || this.measurement.fullname === null || this.measurement.fullname === "") {
+            if (this.measurement.fullname === undefined || this.measurement.fullname === null || this.measurement.fullname === "") {
                 throw new Error("Measurement is blank.");
             } else {
                 this.measurement.fragment = this.measurement.fullname.split(".")[0];
@@ -105,13 +109,13 @@ export class AdvancedRadialGauge implements OnDestroy, OnInit, AfterViewInit {
 
             // Measurement Font Size
             this.measurement.fontSize = _.get(this.config, 'customwidgetdata.measurement.fontSize');
-            if(this.measurement.fontSize === undefined || this.measurement.fontSize === null) {
+            if (this.measurement.fontSize === undefined || this.measurement.fontSize === null) {
                 this.measurement.fontSize = 15;
             }
 
             // Measurement Decimal Digits
             this.measurement.decimalDigits = _.get(this.config, 'customwidgetdata.measurement.decimalDigits');
-            if(this.measurement.decimalDigits === undefined || this.measurement.decimalDigits < 0) {
+            if (this.measurement.decimalDigits === undefined || this.measurement.decimalDigits < 0) {
                 this.measurement.decimalDigits = 0;
             }
 
@@ -120,13 +124,13 @@ export class AdvancedRadialGauge implements OnDestroy, OnInit, AfterViewInit {
 
             // Gauge Axis Width
             this.gauge.axisWidth = _.get(this.config, 'customwidgetdata.gauge.axisWidth');
-            if(this.gauge.axisWidth === undefined || this.gauge.axisWidth <= 0) {
+            if (this.gauge.axisWidth === undefined || this.gauge.axisWidth <= 0) {
                 this.gauge.axisWidth = 1;
             }
 
             // Gauge Axis Label Distance
             this.gauge.axisLabelDistance = _.get(this.config, 'customwidgetdata.gauge.axisLabelDistance');
-            if(this.gauge.axisLabelDistance === undefined) {
+            if (this.gauge.axisLabelDistance === undefined) {
                 this.gauge.axisLabelDistance = -20;
             }
 
@@ -135,37 +139,37 @@ export class AdvancedRadialGauge implements OnDestroy, OnInit, AfterViewInit {
 
             // Gauge Pointer Offset
             this.gauge.pointer.offset = _.get(this.config, 'customwidgetdata.gauge.pointer.offset');
-            if(this.gauge.pointer.offset === undefined) {
+            if (this.gauge.pointer.offset === undefined) {
                 this.gauge.pointer.offset = -75;
             }
 
             // Label Text
             this.label.text = _.get(this.config, 'customwidgetdata.label.text');
-            if(this.label.text === undefined || this.label.text === null) {
+            if (this.label.text === undefined || this.label.text === null) {
                 this.label.text = "";
             }
 
             // Label Font Size
             this.label.fontSize = _.get(this.config, 'customwidgetdata.label.fontSize');
-            if(this.label.fontSize === undefined || this.label.fontSize === null) {
+            if (this.label.fontSize === undefined || this.label.fontSize === null) {
                 this.label.fontSize = 15;
             }
 
             // Label Hyperlink
             this.label.hyperlink = _.get(this.config, 'customwidgetdata.label.hyperlink');
-            if(this.label.hyperlink === undefined || this.label.hyperlink === null) {
+            if (this.label.hyperlink === undefined || this.label.hyperlink === null) {
                 this.label.hyperlink = "";
             }
 
             // Guage Start Value
             this.startValue = _.get(this.config, 'customwidgetdata.startValue');
-            if(this.startValue === undefined) {
+            if (this.startValue === undefined) {
                 this.startValue = 0;
             }
 
             // Guage Ranges
             this.ranges = _.get(this.config, 'customwidgetdata.ranges');
-            if(this.ranges === undefined || this.ranges.length === 0) {
+            if (this.ranges === undefined || this.ranges.length === 0) {
                 throw new Error("Ranges not defined.");
             } else {
                 this.maxValue = this.ranges[this.ranges.length - 1].limitValue;
@@ -177,15 +181,15 @@ export class AdvancedRadialGauge implements OnDestroy, OnInit, AfterViewInit {
             }
 
             // Set Title
-            if(this.label.text !== "") {
-                if(this.label.hyperlink === "") {
+            if (this.label.text !== "") {
+                if (this.label.hyperlink === "") {
                     this.title = this.label.text;
                 } else {
                     this.title = this.label.text + " \u{1F855}";
                 }
             }
-        } catch(e) {
-            console.log("Advanced Radial Guage Widget - "+e);
+        } catch (e) {
+            console.log("Advanced Radial Guage Widget - " + e);
         }
     }
 
@@ -193,19 +197,19 @@ export class AdvancedRadialGauge implements OnDestroy, OnInit, AfterViewInit {
         try {
             // Get Last Measurement Value to start with
             let resp = await this.getLastMeasurement(this.deviceId, this.measurement.fragment, this.measurement.series);
-            if(resp.data.length === 1) {
+            if (resp.data.length === 1) {
                 this.lastMeasurement.value = resp.data[0][this.measurement.fragment][this.measurement.series].value;
-                if(resp.data[0][this.measurement.fragment][this.measurement.series].unit !== undefined && resp.data[0][this.measurement.fragment][this.measurement.series].unit !== null) {
+                if (resp.data[0][this.measurement.fragment][this.measurement.series].unit !== undefined && resp.data[0][this.measurement.fragment][this.measurement.series].unit !== null) {
                     this.lastMeasurement.unit = resp.data[0][this.measurement.fragment][this.measurement.series].unit;
                 }
-                
+
             }
             this.configureTopMarginRequired();
             // Show Chart
             this.showChart();
-        } catch(e) {
-            console.log("Advanced Radial Gauge Widget - "+e);
-        }  
+        } catch (e) {
+            console.log("Advanced Radial Gauge Widget - " + e);
+        }
     }
 
     private showChart(): void {
@@ -214,7 +218,7 @@ export class AdvancedRadialGauge implements OnDestroy, OnInit, AfterViewInit {
         let option: echarts.EChartsOption;
 
         let me = this;
-        option = {
+        this.radialChartOption = {
             title: {
                 text: this.title,
                 left: 'center',
@@ -233,7 +237,7 @@ export class AdvancedRadialGauge implements OnDestroy, OnInit, AfterViewInit {
                 max: this.maxValue,
                 splitNumber: 10,
                 radius: '100%',
-                
+
                 progress: {
                     show: (this.gauge.indicatorType === 'progressbar'),
                     width: this.gauge.axisWidth / 2,
@@ -246,10 +250,10 @@ export class AdvancedRadialGauge implements OnDestroy, OnInit, AfterViewInit {
                     icon: 'path://M12.8,0.7l12,40.1H0.7L12.8,0.7z',
                     length: '12%',
                     width: 20,
-                    offsetCenter: [0, this.gauge.pointer.offset+'%'],
+                    offsetCenter: [0, this.gauge.pointer.offset + '%'],
                     itemStyle: {
-                    color: 'inherit'
-                }
+                        color: 'inherit'
+                    }
                 },
                 axisLine: {
                     lineStyle: {
@@ -291,7 +295,7 @@ export class AdvancedRadialGauge implements OnDestroy, OnInit, AfterViewInit {
                     color: this.gauge.indicatorType === 'progressbar' ? this.gauge.progressBar.color : 'inherit',
                     offsetCenter: [0, '0%'],
                     width: '30%',
-                    formatter: function(value) {
+                    formatter: function (value) {
                         return value.toFixed(me.measurement.decimalDigits) + ' ' + me.lastMeasurement.unit
                     }
                 },
@@ -300,21 +304,20 @@ export class AdvancedRadialGauge implements OnDestroy, OnInit, AfterViewInit {
                 }]
             }]
         };
-
         // Subscribe realtime to measurement
-        this.subscription = this.realtime.subscribe('/measurements/'+this.deviceId, (data) => {
+        this.subscription = this.realtime.subscribe('/measurements/' + this.deviceId, (data) => {
             try {
-                if(data.data.data[this.measurement.fragment] !== undefined && data.data.data[this.measurement.fragment][this.measurement.series] !== undefined) {
+                if (data.data.data[this.measurement.fragment] !== undefined && data.data.data[this.measurement.fragment][this.measurement.series] !== undefined) {
                     this.lastMeasurement.value = data.data.data[me.measurement.fragment][me.measurement.series].value;
                     this.lastMeasurement.unit = "";
-                    if(data.data.data[me.measurement.fragment][me.measurement.series].unit !== undefined && data.data.data[me.measurement.fragment][me.measurement.series].unit !== null) {
+                    if (data.data.data[me.measurement.fragment][me.measurement.series].unit !== undefined && data.data.data[me.measurement.fragment][me.measurement.series].unit !== null) {
                         this.lastMeasurement.unit = data.data.data[me.measurement.fragment][me.measurement.series].unit;
                     }
                     this.radialGauge.setOption<echarts.EChartsOption>({
                         series: [
                             {
-                                detail : {
-                                    formatter: function(value) {
+                                detail: {
+                                    formatter: function (value) {
                                         return value.toFixed(me.measurement.decimalDigits) + ' ' + me.lastMeasurement.unit;
                                     }
                                 },
@@ -327,8 +330,8 @@ export class AdvancedRadialGauge implements OnDestroy, OnInit, AfterViewInit {
                         ]
                     });
                 }
-            } catch(e) {
-                console.log("Advanced Radial Gauge Widget - "+e);
+            } catch (e) {
+                console.log("Advanced Radial Gauge Widget - " + e);
             }
         });
 
@@ -353,8 +356,8 @@ export class AdvancedRadialGauge implements OnDestroy, OnInit, AfterViewInit {
                 ]
             });
         }, 2000);*/
-
-        option && this.radialGauge.setOption(option);
+        console.log('before',option,this.radialChartOption)
+        this.radialChartOption && this.radialGauge.setOption(this.radialChartOption);
     }
 
     private async getLastMeasurement(deviceId: string, fragment: string, series: string) {
@@ -369,20 +372,20 @@ export class AdvancedRadialGauge implements OnDestroy, OnInit, AfterViewInit {
             valueFragmentSeries: series,
             pageSize: 1,
             revert: true
-          }
-          const resp = await this.measurementService.list(filter);
-          return resp;
+        }
+        const resp = await this.measurementService.list(filter);
+        return resp;
     }
 
     // Configure top margin within the widget. This is on the basis if the Widget title is set to hidden or not.
     private configureTopMarginRequired(): void {
-    let allWidgets: NodeListOf<Element> = document.querySelectorAll('.dashboard-grid-child');
-        allWidgets.forEach((w:Element) => {
+        let allWidgets: NodeListOf<Element> = document.querySelectorAll('.dashboard-grid-child');
+        allWidgets.forEach((w: Element) => {
             let widgetElement: Element = w.querySelector('div > div > div > c8y-dynamic-component > lib-advanced-radial-gauge');
-            if(widgetElement !== undefined && widgetElement !== null) {
+            if (widgetElement !== undefined && widgetElement !== null) {
                 let widgetTitleElement: Element = w.querySelector('div > div > div > c8y-dashboard-child-title');
                 const widgetTitleDisplayValue: string = window.getComputedStyle(widgetTitleElement).getPropertyValue('display');
-                if(widgetTitleDisplayValue !== undefined && widgetTitleDisplayValue !== null && widgetTitleDisplayValue === 'none') {
+                if (widgetTitleDisplayValue !== undefined && widgetTitleDisplayValue !== null && widgetTitleDisplayValue === 'none') {
                     this.topMargin = '10px';
                 } else {
                     this.topMargin = '0';
@@ -391,15 +394,27 @@ export class AdvancedRadialGauge implements OnDestroy, OnInit, AfterViewInit {
         });
     }
 
+    // Event called on resize of chart box
+    onChartResized(event: ResizedEvent) {
+         console.log(this.radialGauge,event.newHeight,event.newWidth)
+        this.width = event.newWidth;
+        this.height = event.newHeight;
+        if (this.radialGauge) {
+            this.radialGauge.resize({
+                width: this.width,
+                height: this.height
+            });
+        }
+    }
     ngOnDestroy(): void {
         //unsubscribe from observables here
         try {
-            if(this.subscription !== undefined && this.subscription !== null) {
+            if (this.subscription !== undefined && this.subscription !== null) {
                 this.realtime.unsubscribe(this.subscription);
             }
-        } catch(e) {
-            console.log("Advanced Radial Gauge Widget - "+e);
+        } catch (e) {
+            console.log("Advanced Radial Gauge Widget - " + e);
         }
-        
+
     }
 }
