@@ -16,7 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * @format
+ * 
  */
 
 import { CoreModule, HOOK_COMPONENTS } from "@c8y/ngx-components";
@@ -25,9 +25,15 @@ import { AdvancedRadialGauge } from "./advanced-radial-gauge.component";
 import { NgModule } from "@angular/core";
 import { HttpClientModule } from "@angular/common/http";
 import { DecimalPipe } from "@angular/common";
+import { NgxEchartsModule } from 'ngx-echarts';
+import * as echarts from 'echarts';
+import { AngularResizedEventModule } from 'angular-resize-event';
 
 @NgModule({
-    imports: [CoreModule, HttpClientModule],
+    imports: [CoreModule, HttpClientModule, NgxEchartsModule.forRoot({
+        echarts
+    }),
+        AngularResizedEventModule],
     declarations: [AdvancedRadialGauge, AdvancedRadialGaugeConfig],
     entryComponents: [AdvancedRadialGauge, AdvancedRadialGaugeConfig],
     providers: [
@@ -43,11 +49,11 @@ import { DecimalPipe } from "@angular/common";
                 previewImage: require("@widget-assets/img-preview.png"),
                 data: {
                     ng1: {
-                        options: { 
-                            noDeviceTarget: false, 
-                            noNewWidgets: false, 
-                            deviceTargetNotRequired: false, 
-                            groupsSelectable: true 
+                        options: {
+                            noDeviceTarget: false,
+                            noNewWidgets: false,
+                            deviceTargetNotRequired: false,
+                            groupsSelectable: true
                         },
                     },
                 },
@@ -55,4 +61,4 @@ import { DecimalPipe } from "@angular/common";
         }
     ],
 })
-export class AdvancedRadialGaugeModule {}
+export class AdvancedRadialGaugeModule { }
