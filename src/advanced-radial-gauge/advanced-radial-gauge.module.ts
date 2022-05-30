@@ -25,9 +25,9 @@ import { AdvancedRadialGauge } from "./advanced-radial-gauge.component";
 import { NgModule } from "@angular/core";
 import { HttpClientModule } from "@angular/common/http";
 import { DecimalPipe } from "@angular/common";
-import { NgxEchartsModule } from 'ngx-echarts';
-import * as echarts from 'echarts';
-import { AngularResizedEventModule } from 'angular-resize-event';
+import * as echarts from "echarts";
+import { NgxEchartsModule } from "ngx-echarts";
+import { AngularResizedEventModule } from "angular-resize-event";
 
 @NgModule({
     imports: [CoreModule, HttpClientModule, NgxEchartsModule.forRoot({

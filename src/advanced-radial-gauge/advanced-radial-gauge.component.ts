@@ -333,13 +333,13 @@ export class AdvancedRadialGauge implements OnDestroy, OnInit, AfterViewInit {
             } catch (e) {
                 console.log("Advanced Radial Gauge Widget - " + e);
             }
-        });
+        })
 
         // Uncomment this code to test locally. Comment the above realtime subscription.
-        /*let me = this;
+        /*let me1 = this;
         setInterval(function () {
             const random = +(Math.random() * 60).toFixed(2);
-            me.radialGauge.setOption<echarts.EChartsOption>({
+            me1.radialGauge.setOption<echarts.EChartsOption>({
                 series: [
                     {
                         detail : {
@@ -356,7 +356,6 @@ export class AdvancedRadialGauge implements OnDestroy, OnInit, AfterViewInit {
                 ]
             });
         }, 2000);*/
-        console.log('before',option,this.radialChartOption)
         this.radialChartOption && this.radialGauge.setOption(this.radialChartOption);
     }
 
@@ -396,7 +395,6 @@ export class AdvancedRadialGauge implements OnDestroy, OnInit, AfterViewInit {
 
     // Event called on resize of chart box
     onChartResized(event: ResizedEvent) {
-         console.log(this.radialGauge,event.newHeight,event.newWidth)
         this.width = event.newWidth;
         this.height = event.newHeight;
         if (this.radialGauge) {
