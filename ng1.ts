@@ -40,3 +40,4 @@ import '@c8y/ng1-modules/dataPointTable/cumulocity.json';
 import '@c8y/ng1-modules/switchDisplay/cumulocity.json';
 import '@c8y/ng1-modules/trafficLightWidget/cumulocity.json';
 import '@c8y/ng1-modules/infoGauge/cumulocity.json';
+import '@c8y/ng1-modules/binary-file-download/cumulocity.json';

@@ -32,6 +32,10 @@ import { SensorPhoneModule } from "@c8y/ngx-components/sensor-phone";
 import { AdvancedRadialGaugeConfig } from "./src/advanced-radial-gauge/advanced-radial-gauge.config.component";
 import { AdvancedRadialGauge } from "./src/advanced-radial-gauge/advanced-radial-gauge.component";
 import { DecimalPipe } from "@angular/common";
+import * as echarts from "echarts";
+import { AngularResizedEventModule } from "angular-resize-event";
+import { NgxEchartsModule } from "ngx-echarts";
+
 
 @NgModule({
     imports: [
@@ -46,6 +50,10 @@ import { DecimalPipe } from "@angular/common";
         CockpitDashboardModule,
         SensorPhoneModule,
         UpgradeModule,
+        NgxEchartsModule.forRoot({
+            echarts
+        }),
+        AngularResizedEventModule
     ],
     declarations: [AdvancedRadialGauge, AdvancedRadialGaugeConfig],
     entryComponents: [AdvancedRadialGauge, AdvancedRadialGaugeConfig],
@@ -74,7 +82,7 @@ import { DecimalPipe } from "@angular/common";
                 },
             ],
         }
-    ],
+    ]
 })
 export class AppModule extends HybridAppModule {
     constructor(protected upgrade: NgUpgradeModule) {
