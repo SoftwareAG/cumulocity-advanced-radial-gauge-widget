@@ -4,6 +4,9 @@ This widget shows the latest realtime measurement on a radial gauge.
 
 ![Preview](src/advanced-radial-gauge/assets/img-preview.png)
 
+### Version compatibility
+Advanced Radial Gauge Widget v2.0.1 requires minimum Application Builder v1.3.0. For older versions of Application Builder please use Advanced Radial Gauge Widget v1.0.2.
+
 ### Installation - for the dashboards using Runtime Widget Loader
 1. Download the latest `advanced-radial-gauge-{version}.zip` file from the Releases section.
 2. Make sure you have Runtime Widget Loader installed on your Cockpit or App Builder app.
